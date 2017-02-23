@@ -169,7 +169,7 @@ The final result is below:
 
 Videos below show performance of our algorithm on project and challenge videos.
 
-[![Project Video](https://youtu.be/9rEWE1zmgro)
+[![Project Video](http://img.youtube.com/vi/9rEWE1zmgro/0.jpg)](https://www.youtube.com/watch?v=9rEWE1zmgro&feature=youtu.be)
 
 ##Discussion
 I tried my algorithm with the challenge video and harder challenge. I have to say it is totally a disaster. The problem faced is the parallel inference line with lane which is difficult to be removed. The sharp turn can also be hard to deal with. Bad weather condition is also challenge, like raining, snowing and night. No much idea how to overcome these issues yet.
