@@ -20,9 +20,9 @@ OpenCV is used to get distortion coeffients and camera matrix. The black-white c
 ##Pipeline
 ###Distortion correction
 Already got the camera matrix and distortion parameters. Then every captured frame should be transformed to compensate distortion. The following are the code and frames before and after undistorted. They are not apprent like the chessboard, but the diffence can be got by substracting them.
-<code>
+```
 img_undist = cv2.undistort(image, camera_mtx, dist_coeff, None, new_camera_mtx)
-</code>
+```
 <center>![Road undistorted sample](out_images/road_undistort.png)</center>
 
 ###Binary image generation
@@ -30,9 +30,6 @@ It is time to appy color threshold and sobel filter to generate a binary image w
 
 The following is the filter functions.
 ```python
-
-
-    
 def sobel_filter(image_gray, orient='x', kern_size = 3, thresh=(0, 255)):
     # Calculate directional gradient
     # Apply threshold
@@ -99,6 +96,36 @@ def sat_filter(image, s_threshold=(120,255)):
 ```
 For example, the following is only the saturation channel throldholded with [120, 255]. The back of black car and shadow of tree are also included.
 <center>![thresholded saturation channel](out_images/shadow1.png)</center>
-After apply a brithness threshold on value channel and combined it with thresholded saturation channel, only the yellow line is left:
+After apply brithness threshold on value channel and combine it with thresholded saturation channel, only the yellow line is left:
 <center>![sat and value](out_images/shadow2.png)</center>
 
+Then combine staturation, magnitude, direction and sobel thresholded, get a final binary image.
+```
+    s_th=(120, 255)
+    s_bin = sat_filter(image, s_threshold = s_th)
+
+    img_gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    
+    sobel_kern = 5
+    sobel_th = (50, 150)
+    sobelx_bin = sobel_filter(img_gray, orient='x', kern_size=sobel_kern, thresh=sobel_th)
+    sobely_bin = sobel_filter(img_gray, orient='y', kern_size=sobel_kern, thresh=sobel_th)
+    
+    mag_kern = 9
+    mag_th = (50, 255)
+    mag_bin = mag_filter(img_gray, kern_size=mag_kern, thresh=mag_th)
+    
+    dir_kern = 5
+    dir_th = (0.7, 1.3)
+    direct_bin = direct_filter(img_gray, kern_size=dir_kern, thresh=dir_th)
+    
+    combined_bin = np.zeros_like(img_gray)
+    combined_bin[ (s_bin==1) | ((sobelx_bin==1) & (sobely_bin==1)) \
+                 | ((mag_bin==1) & (direct_bin==1))] = 1
+```
+The visualized binary image is following:
+<center>![combined binary image](out_images/combined.png)</center>
+
+###Perspective transform
+In order to find lane on a binary image, it is better to transform it to a bird-eye view. The straight_lines1.jpg is undistored first. Four points are selected manually on left and right lines as source points, then define four new points in bird-eye view as destination. The four points in the bird-eye view form rectangle corners. cv2.getPerspectiveTransform is called to calculate the perspective transform matrix.
+<center>![Bird-eye view](out_images/warp_persp.png)</center>
