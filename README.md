@@ -1,9 +1,9 @@
 # Advanced Lane Finding
 
 ## Introduction
-Finding the lane is important for the car to know where to drive.  Although P1 already provided some experiments on lane finding, the techniques used in P1 ware canny  and hough transformation by which we can only detect straight lines.
+Finding the lane is important for the car to know where to drive.  Although P1 already provided some experiments on lane finding, the techniques used in P1 were canny  and hough transformation by which we can only detect straight lines.
 
-In this project, advanced techniques, like camera calibration, perspective transformation, sliding window searching, sobel filter and HSV color space, are used to detect lane more accuracilly. The following is an example.
+In this project, advanced techniques, like camera calibration, perspective transformation, sliding window searching, sobel filter and HSV color space, are used to detect lane more accurately. The following is an example.
 
 <center>![Lane fond](out_images/lane_found.png)</center>
 
