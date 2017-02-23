@@ -19,7 +19,7 @@ OpenCV is used to get distortion coeffients and camera matrix. The black-white c
 
 ##Pipeline
 ###Distortion correction
-Already got the camera matrix and distortion parameters. Then every captured frame should be transformed to compensate distortion. The following are the code and frames before and after undistorted. They are not apprent like the chessboard, but the diffence can be got by substracting them.
+Already get the camera matrix and distortion parameters, every captured frame should be transformed to compensate distortion. The following are the code and frames before and after undistorted. They are not apprent like the chessboard, but the diffence can be got by substracting them.
 ```
 img_undist = cv2.undistort(image, camera_mtx, dist_coeff, None, new_camera_mtx)
 ```
