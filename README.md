@@ -160,3 +160,16 @@ The curvature of lane is calculated in term of the formula. The value of x and y
         curva = (2.0*fit_rw[0]) / ((1.0 + (2*fit_rw[0]*py_rw+fit_rw[1])**2)**1.5)
         return curva
 ```
+About the position of the vehicle, we can calculate the offset between the middle of two lanes and the center of the image,
+
+The final result is below:
+<center>![final result](out_images/final.png)</center>
+##Project Video
+
+
+Videos below show performance of our algorithm on project and challenge videos.
+
+[![Project Video](https://youtu.be/9rEWE1zmgro)
+
+##Discussion
+I tried my algorithm with the challenge video and harder challenge. I have to say it is totally a disaster. The problem faced is the parallel inference line with lane which is difficult to be removed. The sharp turn can also be hard to deal with. Bad weather condition is also challenge, like raining, snowing and night. No much idea how to overcome these issues yet.
