@@ -127,5 +127,36 @@ The visualized binary image is following:
 <center>![combined binary image](out_images/combined.png)</center>
 
 ###Perspective transform
-In order to find lane on a binary image, it is better to transform it to a bird-eye view. The straight_lines1.jpg is undistored first. Four points are selected manually on left and right lines as source points, then define four new points in bird-eye view as destination. The four points in the bird-eye view form rectangle corners. cv2.getPerspectiveTransform is called to calculate the perspective transform matrix.
+In order to find lane on a binary image, it is better to transform it to a bird-eye view. The straight_lines1.jpg is undistored first. Four points are selected manually on left and right lines as source points, then define four new points in bird-eye view as destination. The four points in the bird-eye view form rectangle corners. cv2.getPerspectiveTransform is called to calculate the perspective transform matrix. One of the advantage of bird-eye view is most unrelated part in image disappeared, then it is easy to search the lanes.
 <center>![Bird-eye view](out_images/warp_persp.png)</center>
+The perspective matrix can be used to warp other images, like below:
+<center>![Bird-eye view](out_images/warp_test2.png)</center>
+###Find lanes
+Although the lane is very obvious in the bird-eye view, but we need to find the pixel location of the lane. The method to find lane for the first frame and following frame are different. The blind search method is choosed for the first frame.
+####First frame
+Take a histogram of the half part of the binary image to find the start point of lane. The peak location of the left half is the left lane starting point, and the right half is the same.
+<center>![histogram](out_images/hist1.png)</center>
+```python
+        img_h, img_w = image.shape
+        window_height = img_h//self.nwindows
+        
+        hstg = np.sum(image[img_h//2:, :], axis=0)
+  
+        midpoint = img_w//2
+        leftx_base = np.argmax(hstg[:midpoint])
+        rightx_base = np.argmax(hstg[midpoint:]) + midpoint
+```
+Once we found the starting point of the lane, a search window in size 60x36 is placed for each lane. The starting point is at the middle of the bottom of the search window. All the pixels in the search window is recorded. The histogram of pixels in window is calculated. The new peak location is the middle of the bottom of the next search window. Repeat the process until the whole image is searched and all pixels in the series of search window is recored. It looks like this:
+<center>![search windows](out_images/search_windows.png)</center>
+With all the pixels found in all the search window, we can call numpy.polyfit function to fit a best quadratical polynomial which is draw in green line above. Of cource, left and right lane has its indepedent polynomial.
+After get the lanes and polynomial, we can paint the road the tranfrom back into the orignal frame. 
+The code for this algorithm is from Udacity. I am not going to copy it here.
+###Curvature and distance
+The curvature of lane is calculated in term of the formula. The value of x and y should be converted from pixel to measurement in meter. The following is fucntion calculating the curvature of the lane. The radius is the reciprocal of curvature.
+```python
+    def cal_curva(self, py):
+        fit_rw = np.polyfit(self.ally*self.mppy, self.allx*self.mppx, 2)
+        py_rw = py * self.mppy
+        curva = (2.0*fit_rw[0]) / ((1.0 + (2*fit_rw[0]*py_rw+fit_rw[1])**2)**1.5)
+        return curva
+```
