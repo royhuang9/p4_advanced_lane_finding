@@ -5,7 +5,7 @@ Finding the lane is important for the car to know where to drive.  Although P1 a
 
 In this project, advanced techniques, like camera calibration, perspective transformation, sliding window searching, sobel filter and HSV color space, are used to detect lane more accurately. The following is an example.
 
-<center>![Lane fond](out_images/lane_found.png)</center>
+<center> ![Lane fond](out_images/lane_found.png) </center>
 
 ## Camera Calibration
 Camera calibration is to get the distortion parameters and perspective transforation matrix.
@@ -17,15 +17,15 @@ OpenCV is used to get distortion coeffients and camera matrix. The black-white c
 
 <center>![Camera calibration](out_images/camera_undist.png)</center>
 
-##Pipeline
-###Distortion correction
+## Pipeline
+### Distortion correction
 Already get the camera matrix and distortion parameters, every captured frame should be transformed to compensate distortion. The following are the code and frames before and after undistorted. They are not apprent like the chessboard, but the diffence can be got by substracting them.
 ```
 img_undist = cv2.undistort(image, camera_mtx, dist_coeff, None, new_camera_mtx)
 ```
 <center>![Road undistorted sample](out_images/road_undistort.png)</center>
 
-###Binary image generation
+### Binary image generation
 It is time to appy color threshold and sobel filter to generate a binary image which includes lane pixel. 
 
 The following is the filter functions.
@@ -126,14 +126,14 @@ Then combine staturation, magnitude, direction and sobel thresholded, get a fina
 The visualized binary image is following:
 <center>![combined binary image](out_images/combined.png)</center>
 
-###Perspective transform
+### Perspective transform
 In order to find lane on a binary image, it is better to transform it to a bird-eye view. The straight_lines1.jpg is undistored first. Four points are selected manually on left and right lines as source points, then define four new points in bird-eye view as destination. The four points in the bird-eye view form rectangle corners. cv2.getPerspectiveTransform is called to calculate the perspective transform matrix. One of the advantage of bird-eye view is most unrelated part in image disappeared, then it is easy to search the lanes.
 <center>![Bird-eye view](out_images/warp_persp.png)</center>
 The perspective matrix can be used to warp other images, like below:
 <center>![Bird-eye view](out_images/warp_test2.png)</center>
-###Find lanes
+### Find lanes
 Although the lane is very obvious in the bird-eye view, but we need to find the pixel location of the lane. The method to find lane for the first frame and following frame are different. The blind search method is choosed for the first frame.
-####First frame
+#### First frame
 Take a histogram of the half part of the binary image to find the start point of lane. The peak location of the left half is the left lane starting point, and the right half is the same.
 <center>![histogram](out_images/hist1.png)</center>
 ```python
@@ -248,7 +248,7 @@ After get the lanes and polynomial, we can paint the road the tranfrom back into
     
         return img_out
 ```
-####following frames
+#### following frames
 After we find the lanes on the first image, the fitted ploynomial will be used to calculated a base line. A margin of 30 pixels around the base line will form a search area in the following frame. With the pixels in the search area, a new quadratic polynomial is fitted. Repeat the process to search the whole frame.
 If the image is not the first frame, addtioanl checking is applied:
 1. whether the slope of point on the lane with y value 660 has a angle of almost 90 degree. If the difference is bigger than 5 degree, the lane is given up.
@@ -301,7 +301,7 @@ If the lane is given up, five previous lanes will be averaged to used as the def
         img_out[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
         return img_out
 ```
-###Curvature and distance
+### Curvature and distance
 The curvature of lane is calculated in term of the formula. The value of x and y should be converted from pixel to measurement in meter. The following is fucntion calculating the curvature of the lane. The radius is the reciprocal of curvature.
 ```python
     def cal_curva(self, py):
@@ -312,15 +312,15 @@ The curvature of lane is calculated in term of the formula. The value of x and y
 ```
 About the position of the vehicle, we can calculate the offset between the middle of two lanes and the center of the image,
 
-###The final result
+### The final result
 A final image with lane boundary marked and raod painted is below:
 <center>![final result](out_images/final.png)</center>
-##Project Video
+## Project Video
 
 
 Video below show project video with lane found and road painted.
 
 <center>[![Project Video](http://img.youtube.com/vi/9rEWE1zmgro/0.jpg)](https://www.youtube.com/watch?v=9rEWE1zmgro)</center>
 
-##Discussion
+## Discussion
 I tried my algorithm with the challenge video and harder challenge. I have to say it is totally a disaster. The problem faced is the parallel inference line with lane which is difficult to be removed. The sharp turn can also be hard to deal with. Bad weather condition is also challenge, like raining, snowing and night. No much idea how to overcome these issues yet.
