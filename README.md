@@ -95,8 +95,11 @@ def sat_filter(image, s_threshold=(120,255)):
     return combined
 ```
 For example, the following is only the saturation channel throldholded with [120, 255]. The back of black car and shadow of tree are also included.
+
 ![thresholded saturation channel](out_images/shadow1.png)
+
 After apply brithness threshold on value channel and combine it with thresholded saturation channel, only the yellow line is left:
+
 ![sat and value](out_images/shadow2.png)
 
 Then combine staturation, magnitude, direction and sobel thresholded, get a final binary image.
