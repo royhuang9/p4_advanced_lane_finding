@@ -15,7 +15,7 @@ A image is took by projecting 3D points into image plane by a perspective transf
 
 OpenCV is used to get distortion coeffients and camera matrix. The black-white chessboard method is used. Firstly cv2.findChessboard function can find all the corners of chessboard in image and cv2.cornerSubPix will help fine the coordinates. Secondly cv2.calibrateCamera will get the distortion coeffient and camera matrix. Thirdly cv2.getOptimalNewCameraMatrix with alpha set to zero to get a new camera matrix. All the three part parameters are stored in a file for later use.
 
-<center>![Camera calibration](out_images/camera_undist.png)</center>
+![Camera calibration](out_images/camera_undist.png)
 
 ## Pipeline
 ### Distortion correction
@@ -23,7 +23,7 @@ Already get the camera matrix and distortion parameters, every captured frame sh
 ```
 img_undist = cv2.undistort(image, camera_mtx, dist_coeff, None, new_camera_mtx)
 ```
-<center>![Road undistorted sample](out_images/road_undistort.png)</center>
+![Road undistorted sample](out_images/road_undistort.png)
 
 ### Binary image generation
 It is time to appy color threshold and sobel filter to generate a binary image which includes lane pixel. 
@@ -95,9 +95,9 @@ def sat_filter(image, s_threshold=(120,255)):
     return combined
 ```
 For example, the following is only the saturation channel throldholded with [120, 255]. The back of black car and shadow of tree are also included.
-<center>![thresholded saturation channel](out_images/shadow1.png)</center>
+![thresholded saturation channel](out_images/shadow1.png)
 After apply brithness threshold on value channel and combine it with thresholded saturation channel, only the yellow line is left:
-<center>![sat and value](out_images/shadow2.png)</center>
+![sat and value](out_images/shadow2.png)
 
 Then combine staturation, magnitude, direction and sobel thresholded, get a final binary image.
 ```
@@ -124,20 +124,20 @@ Then combine staturation, magnitude, direction and sobel thresholded, get a fina
                  | ((mag_bin==1) & (direct_bin==1))] = 1
 ```
 The visualized binary image is following:
-<center>![combined binary image](out_images/combined.png)</center>
+![combined binary image](out_images/combined.png)
 
 ### Perspective transform
 In order to find lane on a binary image, it is better to transform it to a bird-eye view. The straight_lines1.jpg is undistored first. Four points are selected manually on left and right lines as source points, then define four new points in bird-eye view as destination. The four points in the bird-eye view form rectangle corners. cv2.getPerspectiveTransform is called to calculate the perspective transform matrix. One of the advantage of bird-eye view is most unrelated part in image disappeared, then it is easy to search the lanes.
-<center>![Bird-eye view](out_images/warp_persp.png)</center>
+![Bird-eye view](out_images/warp_persp.png)
 The perspective matrix can be used to warp other images, like below:
-<center>![Bird-eye view](out_images/warp_test2.png)</center>
+![Bird-eye view](out_images/warp_test2.png)
 
 ### Find lanes
 Although the lane is very obvious in the bird-eye view, but we need to find the pixel location of the lane. The method to find lane for the first frame and following frame are different. The blind search method is choosed for the first frame.
 
 #### First frame
 Take a histogram of the half part of the binary image to find the start point of lane. The peak location of the left half is the left lane starting point, and the right half is the same.
-<center>![histogram](out_images/hist1.png)</center>
+![histogram](out_images/hist1.png)
 ```python
         img_h, img_w = image.shape
         window_height = img_h//self.nwindows
@@ -149,7 +149,8 @@ Take a histogram of the half part of the binary image to find the start point of
         rightx_base = np.argmax(hstg[midpoint:]) + midpoint
 ```
 Once we found the starting point of the lane, a search window in size 60x36 is placed for each lane. The starting point is at the middle of the bottom of the search window. All the pixels in the search window is recorded. The histogram of pixels in window is calculated. The new peak location is the middle of the bottom of the next search window. Repeat the process until the whole image is searched and all pixels in the series of search window is recored. It looks like this:
-<center>![search windows](out_images/search_windows.png)</center>
+![search windows](out_images/search_windows.png)
+
 With all the pixels found in all the search window, we can call numpy.polyfit function to fit a best quadratical polynomial which is draw in green line above. Of cource, left and right lane has its indepedent polynomial.
 After get the lanes and polynomial, we can paint the road the tranfrom back into the orignal frame. 
 ```python
@@ -250,6 +251,7 @@ After get the lanes and polynomial, we can paint the road the tranfrom back into
     
         return img_out
 ```
+
 #### following frames
 After we find the lanes on the first image, the fitted ploynomial will be used to calculated a base line. A margin of 30 pixels around the base line will form a search area in the following frame. With the pixels in the search area, a new quadratic polynomial is fitted. Repeat the process to search the whole frame.
 If the image is not the first frame, addtioanl checking is applied:
@@ -316,13 +318,14 @@ About the position of the vehicle, we can calculate the offset between the middl
 
 ### The final result
 A final image with lane boundary marked and raod painted is below:
-<center>![final result](out_images/final.png)</center>
+![final result](out_images/final.png)
+
 ## Project Video
 
 
 Video below show project video with lane found and road painted.
 
-<center>[![Project Video](http://img.youtube.com/vi/9rEWE1zmgro/0.jpg)](https://www.youtube.com/watch?v=9rEWE1zmgro)</center>
+[![Project Video](http://img.youtube.com/vi/9rEWE1zmgro/0.jpg)](https://www.youtube.com/watch?v=9rEWE1zmgro)
 
 ## Discussion
 I tried my algorithm with the challenge video and harder challenge. I have to say it is totally a disaster. The problem faced is the parallel inference line with lane which is difficult to be removed. The sharp turn can also be hard to deal with. Bad weather condition is also challenge, like raining, snowing and night. No much idea how to overcome these issues yet.
