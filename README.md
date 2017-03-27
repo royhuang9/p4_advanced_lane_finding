@@ -5,7 +5,7 @@ Finding the lane is important for the car to know where to drive.  Although P1 a
 
 In this project, advanced techniques, like camera calibration, perspective transformation, sliding window searching, sobel filter and HSV color space, are used to detect lane more accurately. The following is an example.
 
-<center> ![Lane fond](out_images/lane_found.png) </center>
+![Lane fond](out_images/lane_found.png)
 
 ## Camera Calibration
 Camera calibration is to get the distortion parameters and perspective transforation matrix.
@@ -131,8 +131,10 @@ In order to find lane on a binary image, it is better to transform it to a bird-
 <center>![Bird-eye view](out_images/warp_persp.png)</center>
 The perspective matrix can be used to warp other images, like below:
 <center>![Bird-eye view](out_images/warp_test2.png)</center>
+
 ### Find lanes
 Although the lane is very obvious in the bird-eye view, but we need to find the pixel location of the lane. The method to find lane for the first frame and following frame are different. The blind search method is choosed for the first frame.
+
 #### First frame
 Take a histogram of the half part of the binary image to find the start point of lane. The peak location of the left half is the left lane starting point, and the right half is the same.
 <center>![histogram](out_images/hist1.png)</center>
